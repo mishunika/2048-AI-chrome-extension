@@ -6,16 +6,16 @@ function AI() {
 AI.prototype.alterHtml = function() {
     var controlDiv = document.createElement('div');
     controlDiv.className = 'above-game';
-    controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p> <a class="restart-button">Start Solver</a>';
+    controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p><a class="restart-button">Start Solver</a>';
     var gameContainer = document.getElementsByClassName('game-container')[0];
     var container = gameContainer.parentNode;
     container.insertBefore(controlDiv, gameContainer);
 };
 
 AI.prototype.tick = function() {
-    console.log(this);
-    console.log(self);
-    this.game.move(parseInt((Math.random()*10)%2))
+    this.game.move(parseInt((Math.random()*10)%2));
+    var tmpGrid = this.game.grid.clone();
+    console.log(tmpGrid);
 };
 
 function init() {
