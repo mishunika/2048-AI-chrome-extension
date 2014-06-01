@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "2048 AI Extension",
+  "description": "This extension provides you with AI functionality for solving 2048 game.",
+  "version": "1.0",
+
+  "permissions": [
+    "http://gabrielecirulli.github.io/2048/"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://gabrielecirulli.github.io/2048/*"],
+      "js": ["script.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "inject.js"
+  ]
+}
