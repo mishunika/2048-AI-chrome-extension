@@ -23,4 +23,4 @@ function init() {
     window.setInterval(function(){ai.tick();}, 1000);
 }
 
-window.setTimeout(init, 100);
+window.requestAnimationFrame(init);
