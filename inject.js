@@ -87,6 +87,16 @@ AI.prototype.transpose = function(input) {
     return output;
 };
 
+/**
+ * Adds the tile on the specified position by x and y.
+ *
+ * @param {int} x The x position
+ * @param {int} y The y position
+ * @param {int} value The value of the tile.
+ */
+AI.prototype.addTile = function(x, y, value) {
+    this.grid[x + y * 4] = value;
+};
     var controlDiv = document.createElement('div');
     controlDiv.className = 'above-game';
     controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p><a class="restart-button">Start Solver</a>';
@@ -95,15 +105,21 @@ AI.prototype.transpose = function(input) {
     container.insertBefore(controlDiv, gameContainer);
 };
 
-AI.prototype.tick = function() {
-    this.game.move(parseInt((Math.random()*10)%2));
-    var tmpGrid = this.game.grid.clone();
-    console.log(tmpGrid);
-};
-
-function init() {
-    window.ai = new AI();
-    window.setInterval(function(){ai.tick();}, 1000);
+function autoRun() {
+    if (!global_game || global_game.isGameTerminated()) return;
+    var ai = new AI();
+    for (var i = 0; i < 4; ++i) {
+        for (var j = 0; j < 4; ++j) {
+            var t = global_game.grid.cells[i][j];
+            if (t) {
+                ai.addTile(i, j, t.value);
+            } else {
+                ai.addTile(i, j, 0);
+            }
+        }
+    }
+    var dir = [3, 2, 1, 0];
+    ai.initOneStepSearch();
+    global_game.move(dir[ai.best_operation]);
+    setTimeout(autoRun, 0);
 }
-
-window.requestAnimationFrame(init);
