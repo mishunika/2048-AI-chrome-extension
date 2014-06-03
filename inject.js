@@ -8,8 +8,10 @@ Array.prototype.clone = function() {
 };
 
 function AI() {
-    this.alterHtml();
-    this.game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+    this.best_operation = 0;
+    this.grid = [];
+    this.node = 0;
+    this.max_depth = 3;
 }
 /**
  * Helper function that will shift all tiles to left.
@@ -69,8 +71,22 @@ AI.prototype.mergeLeft = function(input) {
     return [result, score];
 };
 
+/**
+ * Keeping it simple. Knowing only how to move left, so, for other moves we will rotate the grid clockwise.
+ * @param input
+ * @returns {Array} The rotated grid.
+ */
+AI.prototype.transpose = function(input) {
+    output = [
+        input[12], input[8],  input[4], input[0],
+        input[13], input[9],  input[5], input[1],
+        input[14], input[10], input[6], input[2],
+        input[15], input[11], input[7], input[3]
+    ];
 
-AI.prototype.alterHtml = function() {
+    return output;
+};
+
     var controlDiv = document.createElement('div');
     controlDiv.className = 'above-game';
     controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p><a class="restart-button">Start Solver</a>';
