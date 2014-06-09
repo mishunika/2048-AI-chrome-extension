@@ -97,6 +97,107 @@ AI.prototype.transpose = function(input) {
 AI.prototype.addTile = function(x, y, value) {
     this.grid[x + y * 4] = value;
 };
+
+/**
+ * Compute the heuristic for a board configuration
+ *
+ * @param input
+ * @returns {number}
+ */
+AI.prototype.heuristic = function(input) {
+    var penalty = 0;
+    var sum = 0;
+    for (var i = 0; i < 16; ++i) {
+        sum += input[i];
+        if (i % 4 != 3) {
+            penalty += Math.abs(input[i] - input[i + 1]);
+        }
+
+        if (i < 12) {
+            penalty += Math.abs(input[i] - input[i + 4]);
+        }
+    }
+    return 4 * sum - 2 * penalty;
+};
+
+/**
+ * The base AI algorithm.
+ *
+ * @param input grid
+ * @param depth value for recurrence
+ * @returns {number}
+ */
+AI.prototype.search = function(input, depth) {
+    this.node++;
+    if (depth >= this.max_depth) {
+        return this.heuristic(input);
+    }
+    var best = -1e+30;
+    var i = 0;
+    var j = 0;
+    for (i = 0; i < 4; i++) {
+        var results = this.mergeLeft(input);
+        var tmp = results[0];
+        var same = true;
+
+        // Checking if the move was performed.
+        for (j = 0; j < 16; j++) {
+            if (tmp[j] != input[j]) {
+                same = false;
+                break;
+            }
+        }
+
+        // If the move was performed (i.e. is possible), then go recursively.
+        if (!same) {
+            var temp = 0;
+            var empty_slots = 0;
+            for (j = 0; j < 16; j++) {
+                if (tmp[j] == 0) {
+                    tmp[j] = 2;
+                    empty_slots++;
+                    temp += this.search(tmp, depth + 1) * 0.9;
+                    tmp[j] = 4;
+                    temp += this.search(tmp, depth + 1) * 0.1;
+                    tmp[j] = 0;
+                }
+            }
+            if (empty_slots != 0) {
+                temp /= empty_slots;
+            } else {
+                temp = -1e+10;
+            }
+
+            if (results[1] + temp > best) {
+                best = results[1] + temp;
+                if (depth == 0) {
+                    this.best_operation = i;
+                }
+            }
+        }
+
+        if (i < 3) {
+            input = this.transpose(input);
+        }
+    }
+    return best;
+};
+
+AI.prototype.initOneStepSearch = function() {
+    this.node = 0;
+    this.max_depth = 3;
+    while (true) {
+        this.node = 0;
+        this.search(this.grid, 0);
+
+        // Preventing huge recursion trees.
+        if (this.node >= 10000 || this.max_depth >= 8) {
+            break;
+        }
+        this.max_depth += 1;
+    }
+};
+
     var controlDiv = document.createElement('div');
     controlDiv.className = 'above-game';
     controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p><a class="restart-button">Start Solver</a>';
