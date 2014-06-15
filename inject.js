@@ -198,13 +198,23 @@ AI.prototype.initOneStepSearch = function() {
     }
 };
 
+
+// AI In action!
+var global_game = null;
+var old_requestAnimationFrame = window.requestAnimationFrame;
+
+window.requestAnimationFrame(function(e) {
+    window.requestAnimationFrame = old_requestAnimationFrame;
+    global_game = new GameManager(4, KeyboardInputManager, HTMLActuator, LocalStorageManager);
+
     var controlDiv = document.createElement('div');
     controlDiv.className = 'above-game';
-    controlDiv.innerHTML = '<p class="game-intro">Additional AI controls</p><a class="restart-button">Start Solver</a>';
+    controlDiv.innerHTML = '<p class="game-intro">AI Extension:</p><a id="ai-btn" class="restart-button">Start the magic</a>';
     var gameContainer = document.getElementsByClassName('game-container')[0];
     var container = gameContainer.parentNode;
     container.insertBefore(controlDiv, gameContainer);
-};
+    document.getElementById('ai-btn').addEventListener("click", autoRun);
+});
 
 function autoRun() {
     if (!global_game || global_game.isGameTerminated()) return;
